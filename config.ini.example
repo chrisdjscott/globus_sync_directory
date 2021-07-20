@@ -1,0 +1,7 @@
+[app]
+clientid = my-client-id
+
+[sync]
+src_endpoint = src-endpoint-id
+dst_endpoint = dst-endpoint-id
+path = dirtoshare
