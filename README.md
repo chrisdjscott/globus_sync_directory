@@ -1,27 +1,43 @@
 # Globus sync directory
 
-Sync a directory between two Globus shared collections.
+Synchronise a directory between two Globus shared collections. Files and
+directories will be synchronised from the specified directory on the source
+endpoint to the destination endpoint.
 
-Files and directories will be recursively copied from the source endpoint to
-the destination endpoint if they do not already exist on the destination
-endpoint or if their checksum do not match. Files removed from the source
-collection will not be removed from the destination collection if they already
-exist there.
+* Files will only be copied if they do not already exist on the destination
+  endpoint or if their checksums do not match (i.e. they were modified on the
+  source endpoint)
+* Files removed from the source collection will not be removed from the
+  destination collection if they already exist there.
+* No files will be changed on the source endpoint (read-only access required)
+* Transfers can be stopped and resumed later (using checksums)
 
 ## Requirements
+
+### Register the app with Globus (one time setup)
 
 We are using [client credentials authentication](https://globus-sdk-python.readthedocs.io/en/stable/examples/client_credentials.html) to authenticate the app directly with Globus.
 
 1. You must register the app and get a Client ID: https://globus-sdk-python.readthedocs.io/en/stable/examples/client_credentials.html#get-a-client
-2. Store the client id in the config file
-3. Store the secret in a file somewhere secure, e.g. *~/.globus_sync_directory.secret*
-4. Create source and destination shared globus collections
-5. Share the collections with the app we created above: *<CLIENT_ID>@clients.auth.globus.org*
-6. Put the collection endpoint ids and path to the directory to share within the src collection into the config file
+   1. Go to [developers.globus.org](https://developers.globus.org/)
+   2. Click *Register your app with Globus*
+   3. Click *Add another project*, give it a project name, e.g. *Sync Directory* and enter a contact email
+   4. On the project, click *Add* and *Add new app*
+      * Give the app a name, e.g. *Sync Directory App*
+      * Make sure *Native App* is **not** selected
+      * Enter the following scopes: openid, profile, email, and urn:globus:auth:scope:transfer.api.globus.org:all
+      * Add the following redirect: https://localhost
+      * Create the app
+   5. Make a note of the *Client ID*
+   6. Click *Generate New Client Secret* and make a note of the secret
+3. Store the client id in the config file in the *app* section, named *clientid*
+4. Store the secret in a file somewhere secure, e.g. *~/.globus_sync_directory_secret*
 
-## TODO:
+### For each directory you want to synchronise
 
-* option to specify multiple directories/endpoints to keep synced
-* option not to wait for completion, e.g. cache transfer id and pick up on previous transfer if find a cached one (could be used with cron)
-* remove files from src endpoint once they have been transferred?
-* notification on completion?
+**Not finished yet**
+
+1. Create source and destination shared globus collections
+2. Share the collections with the app we created above: *<CLIENT_ID>@clients.auth.globus.org*
+3. Put the collection endpoint ids and path to the directory to share within the src collection into the config file
+

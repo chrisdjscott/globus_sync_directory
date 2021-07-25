@@ -1,4 +1,6 @@
 """
+Note: this is just a demo script
+
 Sync directories between Globus shared collections.
 
 """
@@ -14,7 +16,7 @@ SCRIPT_NAME = "globus_sync_directory"
 
 
 def parse_args():
-    default_secret_file = Path.home() / f".{SCRIPT_NAME}.secret"
+    default_secret_file = Path.home() / f".{SCRIPT_NAME}_secret"
 
     parser = argparse.ArgumentParser(description="Sync directories with Globus")
 
