@@ -25,7 +25,11 @@ We are using [client credentials authentication](https://globus-sdk-python.readt
    4. On the project, click *Add* and *Add new app*
       * Give the app a name, e.g. *Sync Directory App*
       * Make sure *Native App* is **not** selected
-      * Enter the following scopes: openid, profile, email, and urn:globus:auth:scope:transfer.api.globus.org:all
+      * Enter the following scopes: 
+        - openid
+        - profile
+        - email
+        - urn:globus:auth:scope:transfer.api.globus.org:all
       * Add the following redirect: https://localhost
       * Create the app
    5. Make a note of the *Client ID*
