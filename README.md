@@ -4,6 +4,23 @@ Synchronise a directory between two Globus shared collections. Files and
 directories will be synchronised from the specified directory on the source
 endpoint to the destination endpoint.
 
+```
+GlobusSharedCollection
+│
+└───folderToBeSynced001
+│   │   file011.txt
+│   │   file012.txt
+│   │
+│   └───subfolder1
+│       │   file111.txt
+│       │   file112.txt
+│       │   ...
+│   
+└───folderToBeSynced002
+    │   file021.txt
+    │   file022.txt
+```
+
 * Files will only be copied if they do not already exist on the destination
   endpoint or if their checksums do not match (i.e. they were modified on the
   source endpoint)
@@ -39,9 +56,14 @@ We are using [client credentials authentication](https://globus-sdk-python.readt
 
 ### For each directory you want to synchronise
 
-**Not finished yet**
+Create source and destination shared globus collections
 
-1. Create source and destination shared globus collections
+1. Locate the directory of the shared collection in the Globus file manager on
+   your endpoint (this will be the directory that contains the directories to
+   be synchronised as subdirectories): [https://app.globus.org/file-manager](https://app.globus.org/file-manager)
 2. Share the collections with the app we created above: *<CLIENT_ID>@clients.auth.globus.org*
 3. Put the collection endpoint ids and path to the directory to share within the src collection into the config file
 
+## Running
+
+TODO
