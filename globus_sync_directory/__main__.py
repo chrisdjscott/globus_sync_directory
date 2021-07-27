@@ -25,12 +25,18 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
 
+    # set up logging
     logging.basicConfig(
         format="[%(asctime)s] %(name)s %(funcName)s():%(lineno)d %(levelname)s: %(message)s",
         level=logging.DEBUG,  # TODO: parameter
     )
+    # different level on imported modules...
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("globus_sdk").setLevel(logging.WARNING)
 
+    # create the coordinator
     c = coordinator.Coordinator(args.config_file, args.secret_file, args.cache_dir)
+    c.run()
 
 
 

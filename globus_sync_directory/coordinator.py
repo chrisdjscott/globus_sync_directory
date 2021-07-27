@@ -3,6 +3,7 @@ import configparser
 import typing as T
 from pathlib import Path
 import logging
+import time
 
 from .directory_syncer import DirectorySyncer
 
@@ -14,12 +15,11 @@ class Coordinator(object):
     """
     def __init__(self, config_file: Path, secret_file: Path, cache_dir: Path):
         self._logger = logging.getLogger("Coordinator")
-        self._cache_dir = cache_dir
         client_secret = self._load_secret(secret_file)
-        self._setup_cache_dir(cache_dir)
-        self._syncers = self._load_config(config_file, client_secret)
+        cache_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        self._syncers = self._load_config(config_file, client_secret, cache_dir)
 
-    def _load_config(self, config_file: Path, client_secret: str) -> T.Iterable[DirectorySyncer]:
+    def _load_config(self, config_file: Path, client_secret: str, cache_dir: Path) -> T.Iterable[DirectorySyncer]:
         """
         Load the config file
 
@@ -53,7 +53,7 @@ class Coordinator(object):
             except KeyError:
                 raise KeyError(f'Sync section "{name}" must specfify "src_endpoint", "dst_endpoint" and "path"')
 
-            ds = DirectorySyncer(client_id, client_secret, name, src_endpoint, dst_endpoint, dirpath)
+            ds = DirectorySyncer(client_id, client_secret, cache_dir, name, src_endpoint, dst_endpoint, dirpath)
             syncers.append(ds)
 
         return syncers
@@ -64,5 +64,21 @@ class Coordinator(object):
 
         return client_secret
 
-    def _setup_cache_dir(self, cache_dir: Path):
-        pass
+    def run(self):
+        """Run the coordinator"""
+        # for debugging, start a transfer...
+        self._logger.debug("Starting transfers")
+        for ds in self._syncers:
+            ds.run(start=True)
+
+        # ...and check every 10s for them to complete
+        self._logger.debug("Waiting for transfers to complete")
+        active = True
+        while active:
+            time.sleep(10)
+            self._logger.debug("Checking...")
+            active = False
+            for ds in self._syncers:
+                ds.run(start=False)
+                if ds.is_active():
+                    active = True
