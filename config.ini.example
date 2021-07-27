@@ -2,7 +2,11 @@
 clientid = my-client-id
 
 [sync]
+# the Globus source endpoint id
 src_endpoint = src-endpoint-id
+# the Globus destination endpoint id
 dst_endpoint = dst-endpoint-id
+# the path to the directory that will be synchronised
 path = dirtoshare
+# optionally, set a time limit (in minutes), default is 24 hours
 timelimitmins = 720

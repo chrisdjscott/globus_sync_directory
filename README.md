@@ -8,13 +8,13 @@ endpoint to the destination endpoint.
 GlobusSharedCollection
 │
 └───dirtoshare
-│   │   file011.txt
-│   │   file012.txt
-│   │
-│   └───subfolder1
-│       │   file111.txt
-│       │   file112.txt
-│       │   ...
+    │   file011.txt
+    │   file012.txt
+    │
+    └───subfolder1
+        │   file111.txt
+        │   file112.txt
+        │   ...
 ```
 
 * Files will only be copied if they do not already exist on the destination
