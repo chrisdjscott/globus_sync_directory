@@ -9,6 +9,7 @@ from pathlib import Path
 import logging
 import urllib
 import json
+import datetime
 
 import globus_sdk
 
@@ -26,6 +27,7 @@ def parse_args():
     parser.add_argument("-s", "--secret-file", default=default_secret_file, type=Path, help=f"Path to secret file (default={default_secret_file})")
     parser.add_argument("-t", "--cache-file", default="globus_sync_directory.json", type=Path, help="Path to cache file (default=globus_sync_directory.json)")
     parser.add_argument("-w", "--wait", action="store_true", help="Wait for the transfer to complete")
+    parser.add_argument("-d", "--dry-run", action="store_true", help="Do everything except submitting or waiting for a transfer")
 
     args = parser.parse_args()
 
@@ -53,6 +55,18 @@ def parse_config(config_file):
         "path": sync_section["path"],
     }
 
+    # deadline
+    timelimitmins = config.getint("sync", "timelimit", fallback=1440)  # default is 24 hours
+    now = datetime.datetime.utcnow()
+    deadline = now + datetime.timedelta(minutes=timelimitmins)
+    sync_info["deadline"] = str(deadline)
+
+    print("Read config file:")
+    print(f"  src_endpoint: {sync_info['src']}")
+    print(f"  dst_endpoint: {sync_info['dst']}")
+    print(f"  path: {sync_info['path']}")
+    print(f"  deadline: {deadline} (now: {now})")
+
     return client_id, sync_info
 
 
@@ -71,11 +85,14 @@ def get_transfer_client(client_id, client_secret):
 def transfer(tc, sync_info):
     """Start the transfer"""
     # initiate the data transfer to NeSI
-    tdata = globus_sdk.TransferData(tc,
-                                    sync_info["src"],
-                                    sync_info["dst"],
-                                    label="Syncing data test",
-                                    sync_level="checksum")
+    tdata = globus_sdk.TransferData(
+        tc,
+        sync_info["src"],
+        sync_info["dst"],
+        label="Syncing data test",
+        sync_level="checksum",
+        deadline=sync_info["deadline"],
+    )
 
     # add the directory to the transfer
     tdata.add_item(sync_info["path"], sync_info["path"], recursive=True)
@@ -195,7 +212,7 @@ def main():
     if transfer_active:
         print(f"Previous transfer ({stored_task_id}) is still active")
         task_id = stored_task_id
-    else:
+    elif not args.dry_run:
         print("Starting transfer")
 
         # start the transfer
@@ -205,7 +222,7 @@ def main():
         write_cache(args.cache_file, task_id)
 
     # optionally wait for the transfer to complete
-    if args.wait:
+    if args.wait and not args.dry_run:
         print("Waiting for transfer to complete")
 
         # wait for tranfer to complete
