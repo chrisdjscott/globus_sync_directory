@@ -1,12 +1,7 @@
 [globus]
 clientid = my-client-id
 
-[firstdirtosync]
+[sync]
 src_endpoint = src-endpoint-id
 dst_endpoint = dst-endpoint-id
 path = dirtoshare
-
-[seconddirtosync]
-src_endpoint = src-endpoint-id-2
-dst_endpoint = dst-endpoint-id-2
-path = dirtoshare2

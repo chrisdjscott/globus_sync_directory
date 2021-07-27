@@ -2,3 +2,4 @@ config.ini
 *.ipynb
 .ipynb_checkpoints/
 __pycache__/
+*.json
