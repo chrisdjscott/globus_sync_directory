@@ -7,7 +7,7 @@ endpoint to the destination endpoint.
 ```
 GlobusSharedCollection
 │
-└───folderToBeSynced001
+└───dirtoshare
 │   │   file011.txt
 │   │   file012.txt
 │   │
@@ -15,19 +15,16 @@ GlobusSharedCollection
 │       │   file111.txt
 │       │   file112.txt
 │       │   ...
-│   
-└───folderToBeSynced002
-    │   file021.txt
-    │   file022.txt
 ```
 
 * Files will only be copied if they do not already exist on the destination
   endpoint or if their checksums do not match (i.e. they were modified on the
   source endpoint)
 * Files removed from the source collection will not be removed from the
-  destination collection if they already exist there.
+  destination collection if they already exist there
 * No files will be changed on the source endpoint (read-only access required)
-* Transfers can be stopped and resumed later (using checksums)
+* Transfers can be stopped and resumed later (using checksums), e.g. by
+  setting a time limit in the config file
 
 ## Requirements
 
@@ -51,7 +48,7 @@ We are using [client credentials authentication](https://globus-sdk-python.readt
       * Create the app
    5. Make a note of the *Client ID*
    6. Click *Generate New Client Secret* and make a note of the secret
-3. Store the client id in the config file in the *app* section, named *clientid*
+3. Store the client id in the config file in the *globus* section, named *clientid*
 4. Store the secret in a file somewhere secure, e.g. *~/.globus_sync_directory_secret*
 
 ### For each directory you want to synchronise
