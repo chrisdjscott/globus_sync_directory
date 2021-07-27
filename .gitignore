@@ -3,3 +3,4 @@ config.ini
 .ipynb_checkpoints/
 __pycache__/
 *.json
+*.log

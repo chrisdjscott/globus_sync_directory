@@ -5,3 +5,4 @@ clientid = my-client-id
 src_endpoint = src-endpoint-id
 dst_endpoint = dst-endpoint-id
 path = dirtoshare
+timelimitmins = 720

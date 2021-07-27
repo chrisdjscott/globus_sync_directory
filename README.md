@@ -64,6 +64,31 @@ Create source and destination shared globus collections
 2. Share the collections with the app we created above: *<CLIENT_ID>@clients.auth.globus.org*
 3. Put the collection endpoint ids and path to the directory to share within the src collection into the config file
 
-## Running
+## Running on NeSI
 
-TODO
+You could automate running the sync via `scrontab` on NeSI using the wrapper script provided and the following steps.
+
+1. Open a terminal (e.g. via https://jupyter.nesi.org.nz) and clone this repo somewhere, e.g.
+   ```
+   git clone https://github.com/chrisdjscott/globus_sync_directory.git ~/globus_sync_directory
+   ```
+2. Create a config file and edit it:
+   ```
+   cd ~/globus_sync_directory
+   cp config.ini.example config.ini
+   # edit config.ini
+   ```
+3. Open your scrontab:
+   ```
+   export EDITOR=nano  # set your favourite editor
+   scrontab
+   ```
+4. Add the following lines, which will run the sync at 7pm daily:
+   ```
+   #SCRON -t 05:00
+   #SCRON --qos=debug
+   0 19 * * * $HOME/globus_sync_directory/nesi_sync_directory_wrapper.sh
+   ```
+5. Your scheduled cron job should show up in the Slurm queue: `squeue -u $USER`
+   - Output from the jobs will show up in: *~/globus_sync_directory/globus_sync_directory.log*
+   - You can query the state of the most recent job, if any, by running: `python globus_sync_directory.py -d` from the repo directory

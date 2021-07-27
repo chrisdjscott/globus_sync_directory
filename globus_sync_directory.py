@@ -56,12 +56,12 @@ def parse_config(config_file):
     }
 
     # deadline
-    timelimitmins = config.getint("sync", "timelimit", fallback=1440)  # default is 24 hours
+    timelimitmins = config.getint("sync", "timelimitmins", fallback=1440)  # default is 24 hours
     now = datetime.datetime.utcnow()
     deadline = now + datetime.timedelta(minutes=timelimitmins)
     sync_info["deadline"] = str(deadline)
 
-    print("Read config file:")
+    print(f"Read config file {config_file}:")
     print(f"  src_endpoint: {sync_info['src']}")
     print(f"  dst_endpoint: {sync_info['dst']}")
     print(f"  path: {sync_info['path']}")
@@ -173,6 +173,7 @@ def read_cache(cache_file):
 
 def write_cache(cache_file, task_id):
     """Write the task_id to cache file"""
+    print(f"Writing cache to {cache_file}")
     cache_dict = {
         "task_id": task_id,
     }
@@ -183,19 +184,17 @@ def write_cache(cache_file, task_id):
 def main():
     # get command line args
     args = parse_args()
-    print(args)
 
     # read config file
     client_id, sync_info = parse_config(args.config_file)
-    print(sync_info)
 
     # load the secret
+    print(f"Loading client secret from {args.secret_file}")
     with open(args.secret_file) as fh:
         client_secret = fh.readline().strip()
 
     # make the globus transfer client
     tc = get_transfer_client(client_id, client_secret)
-    print(tc)
 
     # check endpoints are activated
     check_endpoints(tc, sync_info)
