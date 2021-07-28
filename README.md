@@ -75,17 +75,26 @@ You could automate running the sync via `scrontab` on NeSI using the wrapper scr
    cp config.ini.example config.ini
    # edit config.ini
    ```
-3. Open your scrontab:
+3. Load a Python module
+   ```
+   ml purge
+   ml Python/3.8.2-gimkl-2020a
+   ```
+5. Make sure the requirements are installed:
+   ```
+   pip install --user -r requirement.txt
+   ```
+6. Open your scrontab:
    ```
    export EDITOR=nano  # set your favourite editor
    scrontab
    ```
-4. Add the following lines, which will run the sync at 7pm NZ time daily (note times in `scrontab` are in UTC, so the 7 belows specifies 7am UTC):
+7. Add the following lines, which will run the sync at 7pm NZ time daily (note times in `scrontab` are in UTC, so the 7 belows specifies 7am UTC):
    ```
    #SCRON -t 05:00
    #SCRON --qos=debug
    0 7 * * * $HOME/globus_sync_directory/nesi_sync_directory_wrapper.sh
    ```
-5. Your scheduled cron job should show up in the Slurm queue: `squeue -u $USER`
+8. Your scheduled cron job should show up in the Slurm queue: `squeue -u $USER`
    - Output from the jobs will show up in: *~/globus_sync_directory/globus_sync_directory.log*
    - You can query the state of the most recent job, if any, by running: `python globus_sync_directory.py -d` from the repo directory
