@@ -2,7 +2,7 @@
 
 # change to directory containing this script
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-cd $SCRIPT_DIR
+cd "$SCRIPT_DIR"
 
 # load Python module
 ml purge > /dev/null 2>&1

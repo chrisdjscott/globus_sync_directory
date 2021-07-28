@@ -182,6 +182,7 @@ def write_cache(cache_file, task_id):
 
 
 def main():
+    print("\nRunning globus_sync_directory...")
     # get command line args
     args = parse_args()
 
