@@ -83,7 +83,7 @@ You could automate running the sync via `scrontab` on NeSI using the wrapper scr
    ```
 5. Make sure the requirements are installed:
    ```
-   pip install --user -r requirement.txt
+   pip install --user -r requirements.txt
    ```
 6. Open your scrontab:
    ```
