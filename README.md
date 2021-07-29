@@ -50,6 +50,7 @@ We are using [client credentials authentication](https://globus-sdk-python.readt
    6. Click *Generate New Client Secret* and make a note of the secret
 3. Store the client id in the config file in the *globus* section, named *clientid*
 4. Store the secret in a file somewhere secure, e.g. *~/.globus_sync_directory_secret*
+5. If you are using a personal endpoint, make sure sharing is enabled (Preferences -> Access -> Shareable)
 
 ### For each directory you want to synchronise
 
