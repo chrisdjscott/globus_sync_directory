@@ -4,19 +4,11 @@ Synchronise a directory between two Globus shared collections. Files and
 directories will be synchronised from the specified directory on the source
 endpoint to the destination endpoint.
 
-```
-GlobusSharedCollection
-│
-└───dirtoshare
-    │   file011.txt
-    │   file012.txt
-    │
-    └───subfolder1
-        │   file111.txt
-        │   file112.txt
-        │   ...
-```
+## Functionality
 
+* Files in the source endpoint can be filtered by matching the beginning of
+  their file name and sent to different destinations based on this
+* Files that do not match one of the filters will not be copied anywhere
 * Files will only be copied if they do not already exist on the destination
   endpoint or if their checksums do not match (i.e. they were modified on the
   source endpoint)
@@ -25,6 +17,88 @@ GlobusSharedCollection
 * No files will be changed on the source endpoint (read-only access required)
 * Transfers can be stopped and resumed later (using checksums), e.g. by
   setting a time limit in the config file
+
+## Example
+
+For example, in the following we have created a Globus shared collection,
+*SourceSharedCollection*, that will be our "source", where we put files that
+we want to be transferred. The files to be shared exist within a subdirectory
+of the shared collection. All the files exist within that subdirectory,
+*directoryContainingFiles* (the subdirectory doesn't contain any
+subdirectories itself).
+
+```
+SourceSharedCollection
+│
+└───pathTo
+    │
+    └───directoryContainingFiles
+        │   CONC_file_001.dat
+        │   CONC_file_002.dat
+        │   ...
+        │   DONC_file_001.dat
+        │   DONC_file_002.dat
+        │   ...
+```
+
+We want to be able to send the files starting with *CONC* to a different
+destination from the files starting with *DONC*. We can even choose to send
+them to a different Globus shared collection altogether, e.g:
+
+```
+DestinationSharedCollectionForCONCFiles
+│
+└───pathTo
+    │
+    └───directoryToCopyCONCFilesTo
+        │   CONC_file_001.dat
+        │   CONC_file_002.dat
+        │   ...
+```
+
+and
+
+```
+DestinationSharedCollectionForDONCFiles
+│
+└───pathTo
+    │
+    └───directoryToCopyDONCFilesTo
+        │   DONC_file_001.dat
+        │   DONC_file_002.dat
+        │   ...
+```
+
+The above can be achieved with the following config file (only showing
+relevant sections):
+
+```ini
+...
+
+[source]
+# the Globus source endpoint id
+src_endpoint = SourceSharedCollection
+# the path to the directory containing files to be synchronised
+src_path = /pathTo/directoryContainingFiles
+
+# one section per "filter", the section names must be unique
+[CONC_files]
+# the Globus destination endpoint id for these files
+dst_endpoint = DestinationSharedCollectionForCONCFiles
+# the path these files will be stored in on the destination endpoint
+dst_path = /pathTo/directoryToCopyCONCFilesTo
+# only transfer files that start with the following string
+filter_startswith = CONC
+
+# one section per "filter", the section names must be unique
+[DONC_files]
+# the Globus destination endpoint id for these files
+dst_endpoint = DestinationSharedCollectionForDONCFiles
+# the path these files will be stored in on the destination endpoint
+dst_path = /pathTo/directoryToCopyDONCFilesTo
+# only transfer files that start with the following string
+filter_startswith = DONC
+```
 
 ## Requirements
 

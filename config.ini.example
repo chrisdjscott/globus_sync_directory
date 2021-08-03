@@ -1,12 +1,30 @@
 [globus]
 clientid = my-client-id
 
-[sync]
-# the Globus source endpoint id
-src_endpoint = src-endpoint-id
-# the Globus destination endpoint id
-dst_endpoint = dst-endpoint-id
-# the path to the directory that will be synchronised
-path = dirtoshare
+[schedule]
 # optionally, set a time limit (in minutes), default is 24 hours
 timelimitmins = 720
+
+[source]
+# the Globus source endpoint id
+src_endpoint = src-endpoint-id
+# the path to the directory containing files to be synchronised
+src_path = /path/from/source/endpoint
+
+# one section per "filter", the section names must be unique
+[CONC_files]
+# the Globus destination endpoint id for these files
+dst_endpoint = dst-endpoint-id
+# the path these files will be stored in on the destination endpoint
+dst_path = /path/to/store/conc-files
+# only transfer files that start with the following string
+filter_startswith = CONC
+
+# one section per "filter", the section names must be unique
+[other_files]
+# the Globus destination endpoint id for these files
+dst_endpoint = dst-endpoint-id
+# the path these files will be stored in on the destination endpoint
+dst_path = /path/to/store/other-files
+# only transfer files that start with the following string
+filter_startswith = other
