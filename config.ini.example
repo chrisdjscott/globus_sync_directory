@@ -10,3 +10,6 @@ dst_endpoint = dst-endpoint-id
 path = dirtoshare
 # optionally, set a time limit (in minutes), default is 24 hours
 timelimitmins = 720
+
+[email]
+recipients = email1@example.com,email2@example.com

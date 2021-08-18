@@ -10,6 +10,7 @@ import logging
 import urllib
 import json
 import datetime
+import subprocess
 
 import globus_sdk
 
@@ -61,13 +62,17 @@ def parse_config(config_file):
     deadline = now + datetime.timedelta(minutes=timelimitmins)
     sync_info["deadline"] = str(deadline)
 
+    # email
+    send_email = config.get("email", "recipients", fallback=None)
+
     print(f"Read config file {config_file}:")
     print(f"  src_endpoint: {sync_info['src']}")
     print(f"  dst_endpoint: {sync_info['dst']}")
     print(f"  path: {sync_info['path']}")
     print(f"  deadline: {deadline} (now: {now})")
+    print(f"  email status recipients: {send_email}")
 
-    return client_id, sync_info
+    return client_id, sync_info, send_email
 
 
 def get_transfer_client(client_id, client_secret):
@@ -123,7 +128,7 @@ def wait_for_transfer(tc, task_id):
         print("waiting for transfer to complete...")
     print("transfer is complete")
 
-def get_transfer_status(tc, task_id):
+def get_transfer_status(tc, task_id, send_email):
     """Prints info about a transfer, returns True if the transfer is still active"""
     # info about transfer
     task_info = tc.get_task(task_id)
@@ -139,9 +144,25 @@ def get_transfer_status(tc, task_id):
         "bytes_transferred",
         "bytes_checksummed",
     ]
-    print(f"Transfer status for {task_id}:")
+
+    # message
+    msglines = [f"Transfer status for {task_id}:"]
     for key in keys:
-        print(f"  {key}: {task_info[key]}")
+        msglines.append(f"  {key}: {task_info[key]}")
+    msg = "\n".join(msglines)
+
+    # print to standard output
+    print(msg)
+
+    # optionally, email
+    if send_email is not None:
+        cmdargs = ["/usr/bin/mail", "-s", '"Globus Sync Directory status"', "--"]
+        cmdargs.extend(send_email.split(","))
+        cmd = " ".join(cmdargs)
+        status = subprocess.run(cmd, shell=True, universal_newlines=True, input=msg)
+        if status.returncode:
+            print("Warning: sending email failed")
+            print(cmd)
 
     return not task_info["status"] in TRANSFER_FINISHED_STATUS
 
@@ -187,7 +208,7 @@ def main():
     args = parse_args()
 
     # read config file
-    client_id, sync_info = parse_config(args.config_file)
+    client_id, sync_info, send_email = parse_config(args.config_file)
 
     # load the secret
     print(f"Loading client secret from {args.secret_file}")
@@ -204,7 +225,7 @@ def main():
     stored_task_id = read_cache(args.cache_file)
     if stored_task_id is not None:
         print(f"Checking status of previous transfer: {stored_task_id}")
-        transfer_active = get_transfer_status(tc, stored_task_id)
+        transfer_active = get_transfer_status(tc, stored_task_id, send_email)
     else:
         transfer_active = False
 
@@ -229,7 +250,7 @@ def main():
         wait_for_transfer(tc, task_id)
 
         # print status
-        get_transfer_status(tc, task_id)
+        get_transfer_status(tc, task_id, send_email)
 
 
 if __name__ == "__main__":
