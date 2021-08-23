@@ -108,3 +108,7 @@ You could automate running the sync via `scrontab` on NeSI using the wrapper scr
 8. Your scheduled cron job should show up in the Slurm queue: `squeue -u $USER`
    - Output from the jobs will show up in: *~/globus_sync_directory/globus_sync_directory.log*
    - You can query the state of the most recent job, if any, by running: `python -m globus_sync_directory -d` from the repo directory
+
+## TODO
+
+* [Retrying task submission](https://globus-sdk-python.readthedocs.io/en/stable/examples/advanced_transfer.html#retrying-task-submission)
