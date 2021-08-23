@@ -8,5 +8,9 @@ cd "$SCRIPT_DIR"
 ml purge > /dev/null 2>&1
 ml Python/3.8.2-gimkl-2020a
 
+# load the virtual environment
+export PYTHONNOUSERSITE=1
+source venv/bin/activate
+
 # run the script
-python globus_sync_directory.py $@ >> globus_sync_directory.log 2>&1
+sync_directory $@ >> globus_sync_directory.log 2>&1

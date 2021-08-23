@@ -4,3 +4,7 @@ config.ini
 __pycache__/
 *.json
 *.log
+venv/
+dist/
+*.egg-info/
+build/

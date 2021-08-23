@@ -23,9 +23,9 @@ src_endpoint = src-endpoint-id-2
 # the Globus destination endpoint id
 dst_endpoint = dst-endpoint-id-2
 # the path to the directory on the source endpoint
-src_path = dirtoshare2
+src_path = /
 # the path to the directory on the destination endpoint (defaults to src_path)
-#dst_path = dirtoshare2
+dst_path = /path/to/dir
 
 # comma separated list of email to send output to
 [email]
