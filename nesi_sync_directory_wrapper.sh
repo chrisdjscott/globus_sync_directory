@@ -9,4 +9,4 @@ ml purge > /dev/null 2>&1
 ml Python/3.8.2-gimkl-2020a
 
 # run the script
-python globus_sync_directory.py >> globus_sync_directory.log 2>&1
+python globus_sync_directory.py $@ >> globus_sync_directory.log 2>&1
