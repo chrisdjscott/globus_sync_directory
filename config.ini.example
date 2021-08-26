@@ -28,5 +28,5 @@ src_path = /
 dst_path = /path/to/dir
 
 # comma separated list of email to send output to
-[email]
-recipients = email1@example.com,email2@example.com
+[notification]
+email = email1@example.com,email2@example.com
