@@ -1,5 +1,6 @@
 
 import urllib
+import logging
 
 import globus_sdk
 
@@ -13,6 +14,7 @@ class Transfer:
 
     """
     def __init__(self, name, src_endpoint, src_path, dst_endpoint, dst_path, deadline):
+        self._logger = logging.getLogger(name)
         self._name = name
         self._src_endpoint = src_endpoint
         self._src_path = src_path
@@ -35,7 +37,7 @@ class Transfer:
         try:
             res = self._tc.endpoint_autoactivate(self._src_endpoint)
         except globus_sdk.exc.TransferAPIError as exc:
-            print(f"[{self._name}]:  Error activating source endpoint - check the config is correct")
+            self._logger.error(f"[{self._name}]:  Error activating source endpoint - check the config is correct")
             raise
         if res["code"] == "AutoActivationFailed":
             raise RuntimeError(f"Could not autoactivate src endpoint for {self._name}")
@@ -44,15 +46,14 @@ class Transfer:
         try:
             res = self._tc.operation_ls(self._src_endpoint, path=self._src_path)
         except globus_sdk.exc.TransferAPIError as exc:
-            print(f"[{self._name}]:  Error could not list source directory - check the path is correct")
+            self._logger.error(f"[{self._name}]:  Error could not list source directory - check the path is correct")
             raise
-        print(res)
 
         # check we can access the destination endpoint
         try:
             res = self._tc.endpoint_autoactivate(self._dst_endpoint)
         except globus_sdk.exc.TransferAPIError as exc:
-            print(f"[{self._name}]:  Error activating destination endpoint - check the config is correct")
+            self._logger.error(f"[{self._name}]:  Error activating destination endpoint - check the config is correct")
             raise
         if res["code"] == "AutoActivationFailed":
             raise RuntimeError(f"Could not autoactivate dst endpoint for {self._name}")
@@ -97,7 +98,8 @@ class Transfer:
             self._msg.append("")
 
             # print to standard output
-            print("\n".join(msg))
+            for line in msg:
+                self._logger.info(line)
 
             # if the transfer is finished, then remove the id
             if task_info["status"] in TRANSFER_FINISHED_STATUS:
@@ -109,7 +111,7 @@ class Transfer:
 
     def process(self, start=True):
         """Process the transfer or print status if already active"""
-        print(f"Processing: {self._name}")
+        self._logger.info(f"Processing: {self._name}")
 
         # if there was an id stored in the cache, check if it is active
         self._msg = [f"[{self._name}]: Checking status of current transfer (if any)..."]
@@ -142,7 +144,7 @@ class Transfer:
         # actually start the transfer
         transfer_result = self._tc.submit_transfer(tdata)
         self._transfer_id = transfer_result["task_id"]
-        print(f"transfer id: {self._transfer_id}")
+        self._logger.info(f"transfer id: {self._transfer_id}")
         self._msg.append(f"[{self._name}]: Transfer started with id: {self._transfer_id}")
 
         # print url for viewing changes
@@ -153,6 +155,6 @@ class Transfer:
                 'destination_id': self._dst_endpoint,
                 'destination_path': self._dst_path,
             })
-        print('Visit the link below to see the changes:\n{}'.format(url_string))
+        self._logger.info('Visit the link below to see the changes:\n{}'.format(url_string))
         self._msg.append(f"[{self._name}]: Visit the link below to see the changes:\n{url_string}")
         self._msg.append("")

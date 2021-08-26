@@ -4,6 +4,7 @@ Sync directories between Globus shared collections.
 """
 import argparse
 from pathlib import Path
+import logging
 
 from .syncer import Syncer
 
@@ -17,8 +18,9 @@ def parse_args():
     parser.add_argument("-c", "--config-file", default="config.ini", type=Path, help="Path to config file (default=config.ini)")
     parser.add_argument("-s", "--secret-file", default=default_secret_file, type=Path, help=f"Path to secret file (default={default_secret_file})")
     parser.add_argument("-t", "--cache-file", default="globus_sync_directory.json", type=Path, help="Path to cache file (default=globus_sync_directory.json)")
-    parser.add_argument("-w", "--wait", action="store_true", help="Wait for the transfer to complete")
     parser.add_argument("-d", "--dry-run", action="store_true", help="Do everything except submitting or waiting for a transfer")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("-q", "--quiet", action="store_true", help="Only display warnings or errors")
 
     args = parser.parse_args()
 
@@ -26,9 +28,25 @@ def parse_args():
 
 
 def main():
-    print("\nRunning globus_sync_directory...")
     # get command line args
     args = parse_args()
+
+    # logging
+    if args.verbose:
+        logging_level = logging.DEBUG
+    elif args.quiet:
+        logging_level = logging.WARNING
+    else:
+        logging_level = logging.INFO
+    logging.basicConfig(
+        level=logging_level,
+        format="[%(asctime)s] %(name)s %(levelname)s: %(message)s",
+    )
+    logging.getLogger("globus_sdk").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+    print()
+    logging.info("Running globus_sync_directory...")
 
     # create the directory syncer
     s = Syncer(args.config_file, args.secret_file, args.cache_file)
