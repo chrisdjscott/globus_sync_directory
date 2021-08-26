@@ -90,7 +90,7 @@ You could automate running the sync via `scrontab` on NeSI using the wrapper scr
    ```
    python -m venv venv
    source venv/bin/activate
-   python setup.py install
+   pip install .
    ```
 6. Open your scrontab:
    ```
