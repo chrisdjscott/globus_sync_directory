@@ -31,13 +31,31 @@ class Transfer:
 
     def check_endpoints(self):
         """Check the endpoints can be activated"""
-        res = self._tc.endpoint_autoactivate(self._src_endpoint)
+        # check we can access the source endpoint
+        try:
+            res = self._tc.endpoint_autoactivate(self._src_endpoint)
+        except globus_sdk.exc.TransferAPIError as exc:
+            print(f"[{self._name}]:  Error activating source endpoint - check the config is correct")
+            raise
         if res["code"] == "AutoActivationFailed":
-            raise RuntimeError(f"Could not activate src endpoint for {self._name}")
+            raise RuntimeError(f"Could not autoactivate src endpoint for {self._name}")
 
-        res = self._tc.endpoint_autoactivate(self._dst_endpoint)
+        # check the source path exists
+        try:
+            res = self._tc.operation_ls(self._src_endpoint, path=self._src_path)
+        except globus_sdk.exc.TransferAPIError as exc:
+            print(f"[{self._name}]:  Error could not list source directory - check the path is correct")
+            raise
+        print(res)
+
+        # check we can access the destination endpoint
+        try:
+            res = self._tc.endpoint_autoactivate(self._dst_endpoint)
+        except globus_sdk.exc.TransferAPIError as exc:
+            print(f"[{self._name}]:  Error activating destination endpoint - check the config is correct")
+            raise
         if res["code"] == "AutoActivationFailed":
-            raise RuntimeError(f"Could not activate dst endpoint for {self._name}")
+            raise RuntimeError(f"Could not autoactivate dst endpoint for {self._name}")
 
     def read_cache(self, cache):
         """Reference to the cache dict"""

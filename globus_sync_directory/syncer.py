@@ -67,6 +67,7 @@ class Syncer:
         transfer_sections = [s for s in config.sections() if s not in other_sections]
         self._transfers = []
         for transfer_section in transfer_sections:
+            print(f'  reading transfer section: {transfer_section}')
             src_endpoint = config[transfer_section]["src_endpoint"]
             src_path = config.get(transfer_section, "src_path", fallback="/")
             dst_endpoint = config[transfer_section]["dst_endpoint"]
