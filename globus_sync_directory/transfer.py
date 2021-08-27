@@ -98,8 +98,14 @@ class Transfer:
             self._msg.append("")
 
             # print to standard output
-            for line in msg:
-                self._logger.info(line)
+            if task_info["status"] == "FAILED" or (task_info["is_ok"] is not None and not task_info["is_ok"]):
+                # print everything if failed
+                self._logger.warning("Transfer failed!")
+                for key in task_info.data.keys():
+                    self._logger.warning(f"  {key}: {task_info[key]}")
+            else:
+                for line in msg:
+                    self._logger.info(line)
 
             # if the transfer is finished, then remove the id
             if task_info["status"] in TRANSFER_FINISHED_STATUS:
