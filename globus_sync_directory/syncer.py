@@ -99,7 +99,7 @@ class Syncer:
 
         # pass transfer client
         for t in self._transfers:
-            t.set_transfer_client(self._transfer_client)
+            t.set_transfer_client(self._transfer_client, self._client_id)
 
     def _check_endpoints(self):
         """Check that the app has access to the endpoints"""

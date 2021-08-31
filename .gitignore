@@ -4,7 +4,7 @@
 __pycache__/
 *.json
 *.log
-venv/
+venv*/
 dist/
 *.egg-info/
 build/
