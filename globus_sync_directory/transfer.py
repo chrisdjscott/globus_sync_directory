@@ -4,6 +4,8 @@ import logging
 
 import globus_sdk
 
+from . import email
+
 
 TRANSFER_FINISHED_STATUS = ("SUCCEEDED", "FAILED")
 
@@ -13,7 +15,7 @@ class Transfer:
     A single directory sync
 
     """
-    def __init__(self, name, src_endpoint, src_path, dst_endpoint, dst_path, deadline):
+    def __init__(self, name, src_endpoint, src_path, dst_endpoint, dst_path, deadline, email):
         self._logger = logging.getLogger(name)
         self._name = name
         self._src_endpoint = src_endpoint
@@ -24,6 +26,7 @@ class Transfer:
         self._transfer_id = None
         self._transfer_client = None
         self._client_id = None
+        self._email = email
         self._msg = []
 
     def __repr__(self):
@@ -128,9 +131,48 @@ class Transfer:
                 for line in msg:
                     self._logger.info(line)
 
+            # email if successful and files were transferred
+            if self._email is not None:
+                self._send_email(task_info)
+
             # if the transfer is finished, then remove the id
             if task_info["status"] in TRANSFER_FINISHED_STATUS:
                 self._transfer_id = None
+
+    def _send_email(self, task_info):
+        """Send email if successful and files were transferred"""
+        if task_info["status"] == "SUCCEEDED" and task_info["files_transferred"] > 0:
+            self._logger.debug(f"Creating email to send to: {self._email}")
+            subject = "[Globus Sync Directory] transfer complete"
+
+            url_string = 'https://app.globus.org/file-manager?' + \
+                urllib.parse.urlencode({
+                    'origin_id': self._dst_endpoint,
+                    'origin_path': self._dst_path,
+                })
+
+            def nice_size(size_bytes):
+                units = ["B", "KB", "MB", "GB", "TB", "PB"]
+                size = size_bytes
+                size_unit = units.pop(0)
+                while size >= 1024 and len(units):
+                    size /= 1024
+                    size_unit = units.pop(0)
+                return f"{size:.3f} {size_unit}"
+
+            msg = [
+                f"Source endpoint: {task_info['source_endpoint_display_name']}",
+                f"Source path: {self._src_path}",
+                f"Destination endpoint: {task_info['destination_endpoint_display_name']}",
+                f"Destination path: {self._src_path}",
+                f"Status: {task_info['status']}",
+                f"Number of directories: {task_info['directories']}",
+                f"Files transferred: {task_info['files_transferred']}",
+                f"Amount transferred: {nice_size(task_info['bytes_transferred'])}",
+                f"View transferred files here: {url_string}",
+            ]
+            self._logger.debug("Sending email:\n" + "\n".join(msg))
+            email.send_email(self._email.split(","), subject, "\n".join(msg))
 
     def get_msg(self):
         """Return the message"""

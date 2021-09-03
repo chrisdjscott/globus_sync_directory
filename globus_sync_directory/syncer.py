@@ -9,6 +9,7 @@ import logging
 import globus_sdk
 
 from .transfer import Transfer
+from . import email
 
 
 class Syncer:
@@ -70,19 +71,28 @@ class Syncer:
         self._transfers = []
         for transfer_section in transfer_sections:
             self._logger.debug(f"Reading transfer section: {transfer_section}")
+            # source endpoint (required)
             try:
                 src_endpoint = config[transfer_section]["src_endpoint"]
             except KeyError:
                 self._logger.error(f"No 'src_endpoint' in transfer section '{transfer_section}'")
                 raise
+            # source path (optional default to root)
             src_path = config.get(transfer_section, "src_path", fallback="/")
+            # destination endpoint (required)
             try:
                 dst_endpoint = config[transfer_section]["dst_endpoint"]
             except KeyError:
                 self._logger.error(f"No 'dst_endpoint' in transfer section '{transfer_section}'")
                 raise
+            # destination path (optional, defaults to source path)
             dst_path = config.get(transfer_section, "dst_path", fallback=src_path)
-            self._transfers.append(Transfer(transfer_section, src_endpoint, src_path, dst_endpoint, dst_path, self._deadline))
+            # transfer email (optional)
+            transfer_email = config.get(transfer_section, "email", fallback=None)
+            # create the Transfer object
+            self._transfers.append(Transfer(transfer_section, src_endpoint, src_path,
+                                            dst_endpoint, dst_path, self._deadline,
+                                            transfer_email))
             self._logger.info(f'  adding transfer: {self._transfers[-1]}')
 
     def _create_transfer_client(self):
@@ -142,11 +152,4 @@ class Syncer:
         if len(output):
             # optionally, email
             if self._notify_email is not None:
-                self._logger.info(f"notifying by email: {self._notify_email}")
-                cmdargs = ["/usr/bin/mail", "-s", '"Globus Sync Directory status"', "--"]
-                cmdargs.extend(self._notify_email.split(","))
-                cmd = " ".join(cmdargs)
-                status = subprocess.run(cmd, shell=True, universal_newlines=True, input="\n".join(output))
-                if status.returncode:
-                    self._logger.warning("Warning: sending email failed")
-                    self._logger.warning(cmd)
+                email.send_email(self._notify_email.split(","), "[Globus Sync Directory] status", "\n".join(output))

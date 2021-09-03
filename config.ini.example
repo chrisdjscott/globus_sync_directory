@@ -6,7 +6,11 @@ clientid = my-client-id
 [schedule]
 timelimitmins = 300
 
-# one or more sections with arbitrary names for each directory to be synchronised
+# comma separated list of emails to send all output to (optional)
+[notification]
+email = email1@example.com,email2@example.com
+
+# one or more sections (with arbitrary section names) for each directory to be synchronised
 [nameofthissync]
 # the Globus source endpoint id
 src_endpoint = src-endpoint-id
@@ -14,8 +18,10 @@ src_endpoint = src-endpoint-id
 dst_endpoint = dst-endpoint-id
 # the path to the directory on the source endpoint
 src_path = dirtoshare
-# the path to the directory on the destination endpoint (defaults to src_path)
+# the path to the directory on the destination endpoint (optional, defaults to src_path)
 #dst_path = dirtoshare
+# email notification when files have been transferred (optional)
+email = email3@example.com
 
 [nameofanothersync]
 # the Globus source endpoint id
@@ -24,9 +30,7 @@ src_endpoint = src-endpoint-id-2
 dst_endpoint = dst-endpoint-id-2
 # the path to the directory on the source endpoint
 src_path = /
-# the path to the directory on the destination endpoint (defaults to src_path)
+# the path to the directory on the destination endpoint (optional, defaults to src_path)
 dst_path = /path/to/dir
-
-# comma separated list of email to send output to
-[notification]
-email = email1@example.com,email2@example.com
+# email notification when files have been transferred (optional)
+email = email4@example.com,email5@example.com
