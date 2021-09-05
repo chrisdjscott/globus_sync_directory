@@ -143,7 +143,7 @@ class Transfer:
         """Send email if successful and files were transferred"""
         if task_info["status"] == "SUCCEEDED" and task_info["files_transferred"] > 0:
             self._logger.debug(f"Creating email to send to: {self._email}")
-            subject = "[Globus Sync Directory] transfer complete"
+            subject = f"[Globus Sync Directory] {self._name} transfer complete"
 
             url_string = 'https://app.globus.org/file-manager?' + \
                 urllib.parse.urlencode({
