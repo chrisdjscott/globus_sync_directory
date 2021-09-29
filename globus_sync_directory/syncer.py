@@ -90,7 +90,7 @@ class Syncer:
             # transfer email (optional)
             transfer_email = config.get(transfer_section, "email", fallback=None)
             # delete source files when transfer is complete (optional default to False)
-            delete = config.get(transfer_section, "delete", fallback=False)
+            delete = config.getboolean(transfer_section, "delete", fallback=False)
             # create the Transfer object
             self._transfers.append(Transfer(transfer_section, src_endpoint, src_path,
                                             dst_endpoint, dst_path, self._deadline,
