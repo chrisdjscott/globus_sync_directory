@@ -52,7 +52,7 @@ def main():
     s = Syncer(args.config_file, args.secret_file, args.cache_file)
 
     # process the transfers
-    s.process(start=(not args.dry_run))
+    s.process(start=(not args.dont_start))
 
 
 if __name__ == "__main__":
