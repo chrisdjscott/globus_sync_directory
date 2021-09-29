@@ -22,6 +22,8 @@ src_path = dirtoshare
 #dst_path = dirtoshare
 # email notification when files have been transferred (optional)
 email = email3@example.com
+# delete source files if transfer successfully completed (optional, defaults to false)
+delete = true
 
 [nameofanothersync]
 # the Globus source endpoint id
@@ -34,3 +36,5 @@ src_path = /
 dst_path = /path/to/dir
 # email notification when files have been transferred (optional)
 email = email4@example.com,email5@example.com
+# delete source files if transfer successfully completed (optional, defaults to false)
+#delete = false
