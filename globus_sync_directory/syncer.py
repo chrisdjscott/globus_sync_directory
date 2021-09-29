@@ -89,10 +89,12 @@ class Syncer:
             dst_path = config.get(transfer_section, "dst_path", fallback=src_path)
             # transfer email (optional)
             transfer_email = config.get(transfer_section, "email", fallback=None)
+            # delete source files when transfer is complete (optional default to False)
+            delete = config.get(transfer_section, "delete", fallback=False)
             # create the Transfer object
             self._transfers.append(Transfer(transfer_section, src_endpoint, src_path,
                                             dst_endpoint, dst_path, self._deadline,
-                                            transfer_email))
+                                            transfer_email, delete))
             self._logger.info(f'  adding transfer: {self._transfers[-1]}')
 
     def _create_transfer_client(self):
@@ -114,8 +116,14 @@ class Syncer:
     def _check_endpoints(self):
         """Check that the app has access to the endpoints"""
         self._logger.debug(f"Checking access to the endpoints")
+        good_transfers = []
         for t in self._transfers:
-            t.check_endpoints()
+            errors = t.check_endpoints()
+            if errors:
+                self._logger.error(f"Skipping transfer due to failed endpoint check: {t}")
+            else:
+                good_transfers.append(t)
+        self._transfers = good_transfers
 
     def _read_cache(self):
         """Read cache file"""

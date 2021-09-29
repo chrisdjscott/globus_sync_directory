@@ -18,7 +18,7 @@ def parse_args():
     parser.add_argument("-c", "--config-file", default="config.ini", type=Path, help="Path to config file (default=config.ini)")
     parser.add_argument("-s", "--secret-file", default=default_secret_file, type=Path, help=f"Path to secret file (default={default_secret_file})")
     parser.add_argument("-t", "--cache-file", default="globus_sync_directory.json", type=Path, help="Path to cache file (default=globus_sync_directory.json)")
-    parser.add_argument("-d", "--dry-run", action="store_true", help="Do everything except submitting or waiting for a transfer")
+    parser.add_argument("-d", "--dont-start", action="store_true", help="Do not start a transfer")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
     parser.add_argument("-q", "--quiet", action="store_true", help="Only display warnings or errors")
 
