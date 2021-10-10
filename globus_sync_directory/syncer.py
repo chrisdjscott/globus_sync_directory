@@ -12,6 +12,14 @@ from .transfer import Transfer
 from . import email
 
 
+VALID_SYNC_LEVELS = [
+    "exists",
+    "size",
+    "mtime",
+    "checksum",
+]
+
+
 class Syncer:
     """
     Sync directories between Globus endpoints
@@ -91,10 +99,15 @@ class Syncer:
             transfer_email = config.get(transfer_section, "email", fallback=None)
             # delete source files when transfer is complete (optional default to False)
             delete = config.getboolean(transfer_section, "delete", fallback=False)
+            # sync level (optional, default to mtime)
+            sync_level = config.get(transfer_section, "sync_level", fallback="mtime")
+            if sync_level not in VALID_SYNC_LEVELS:
+                self._logger.error(f'"{sync_level}" in transfer section "{transfer_section}" is not valid')
+                raise ValueError(f'"{sync_level}" in transfer section "{transfer_section}" is not valid')
             # create the Transfer object
             self._transfers.append(Transfer(transfer_section, src_endpoint, src_path,
                                             dst_endpoint, dst_path, self._deadline,
-                                            transfer_email, delete))
+                                            transfer_email, delete, sync_level))
             self._logger.info(f'  adding transfer: {self._transfers[-1]}')
 
     def _create_transfer_client(self):

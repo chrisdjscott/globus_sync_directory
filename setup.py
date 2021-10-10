@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="globus_sync_directory",
-    version="0.2.1",
+    version="0.3.0",
     description="Sync directories with Globus",
     url="https://github.com/chrisdjscott/globus_sync_directory",
     author="Chris Scott",

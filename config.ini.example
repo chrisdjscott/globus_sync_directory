@@ -24,6 +24,8 @@ src_path = dirtoshare
 email = email3@example.com
 # delete source files if transfer successfully completed (optional, defaults to false)
 delete = true
+# sync level, valid values are "exists", "size", "mtime" and "checksum" (optional, defaults to mtime)
+sync_level = mtime
 
 [nameofanothersync]
 # the Globus source endpoint id
@@ -38,3 +40,5 @@ dst_path = /path/to/dir
 email = email4@example.com,email5@example.com
 # delete source files if transfer successfully completed (optional, defaults to false)
 #delete = false
+# sync level, valid values are "exists", "size", "mtime" and "checksum" (optional, defaults to mtime)
+#sync_level = mtime

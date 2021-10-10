@@ -28,7 +28,7 @@ class Transfer:
     A single directory sync
 
     """
-    def __init__(self, name, src_endpoint, src_path, dst_endpoint, dst_path, deadline, email, delete):
+    def __init__(self, name, src_endpoint, src_path, dst_endpoint, dst_path, deadline, email, delete, sync_level):
         self._logger = logging.getLogger(name)
         self._name = name
         self._src_endpoint = src_endpoint
@@ -43,9 +43,11 @@ class Transfer:
         self._delete = delete
         self._deletion_id = None
         self._msg = []
+        self._sync_level = sync_level
+        self._sent_success_email = False
 
     def __repr__(self):
-        return f"{self._name}: ({self._src_endpoint}:{self._src_path} -> {self._dst_endpoint}:{self._dst_path}), delete={self._delete}"
+        return f"{self._name}: ({self._src_endpoint}:{self._src_path} -> {self._dst_endpoint}:{self._dst_path}), delete={self._delete}, sync_level={self._sync_level}"
 
     def set_transfer_client(self, transfer_client, client_id):
         """Reference to the transfer client"""
@@ -109,6 +111,8 @@ class Transfer:
                 self._transfer_id = d["transfer_id"]
             if "deletion_id" in d:
                 self._deletion_id = d["deletion_id"]
+            if "sent_success_email" in d:
+                self._sent_success_email = d["sent_success_email"]
 
     def set_cache(self, cache):
         """Set cache value"""
@@ -117,6 +121,8 @@ class Transfer:
             d["transfer_id"] = self._transfer_id
         if self._deletion_id is not None:
             d["deletion_id"] = self._deletion_id
+        if self._sent_success_email:
+            d["sent_success_email"] = self._sent_success_email
 
         if len(d):
             cache[self._name] = d
@@ -208,10 +214,10 @@ class Transfer:
 
             # if successful
             if task_info["status"] == "SUCCEEDED":
-                if task_info["files_transferred"] > 0:
-                    # send email, only if files were transferred too
-                    if self._email is not None:
-                        self._send_email(task_info)
+                # we send an email the first time the transfer succeeded, or if more files were transferred later
+                if self._email is not None and (task_info["files_transferred"] > 0 or not self._sent_success_email):
+                    self._send_email(task_info)
+                    self._sent_success_email = True
 
                 # start a deletion job
                 if self._delete:
@@ -288,7 +294,7 @@ class Transfer:
             self._src_endpoint,
             self._dst_endpoint,
             label=f"Syncing data for {self._name}",
-            sync_level="checksum",
+            sync_level=self._sync_level,
             deadline=self._deadline,
         )
 
