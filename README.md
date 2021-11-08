@@ -53,51 +53,79 @@ We are using [client credentials authentication](https://globus-sdk-python.readt
 4. Store the secret in a file somewhere secure, e.g. *~/.globus_sync_directory_secret*
 5. If you are using a personal endpoint, make sure sharing is enabled (Preferences -> Access -> Shareable)
 
-### For each directory you want to synchronise
+### Globus Endpoint
 
-Create source and destination shared globus collections
+You need to have a Globus end point running with access to the source data and another at the destination (e.g. the
+NeSI managed endpoint for the destination).
 
-**Note**: if creating an endpoint on a Globus personal endpoint, make sure you
-have enabled sharing for that endpoint in the Globus personal endpoint
-settings/preferences.
+If you are using a personal endpoint, make sure you have enabled sharing for the relevant locations. This is a setting
+within the personal endpoint software. For example, on a Mac you would set this by opening the application preferences and enabling
+sharing there.
 
-1. Locate the directory of the shared collection in the Globus file manager on
-   your endpoint (this will be the directory that contains the directories to
-   be synchronised as subdirectories): [https://app.globus.org/file-manager](https://app.globus.org/file-manager)
-2. Share the collections with the app we created above: *<CLIENT_ID>@clients.auth.globus.org*
-3. Put the collection endpoint ids and path to the directory to share within the src collection into the config file
+### Shared collections for each directory you want to synchronise
 
-## Running on NeSI
+Create source and destination shared globus collections through the [Globus web app](https://app.globus.org/).
 
-You could automate running the sync via `scrontab` on NeSI using the wrapper script provided and the following steps.
+1. Locate the directory of the shared collection in the [Globus file manager](https://app.globus.org/file-manager) on
+   your endpoint (this will be the directory that contains the files and/or directories to
+   be synchronised) and select the "Share" option
+
+   ![](doc/00_sharedir.png)
+
+2. On the share settings page, select "Add a Guest Collection"
+
+   ![](doc/01_sharescreen.png)
+
+3. On the "Create New Guest Collection" page, make sure the path is correct and give the share a name
+
+   ![](doc/02_create_guest_collection.png)
+
+4. After creating the share, you should be on the permissions page for the share, where you can select "Add Permissions - Share With" and
+   share the collections with the app we created previously (enter the following as the username to share with: *<CLIENT_ID>@clients.auth.globus.org*)
+
+   ![](doc/03_share_permissions.png)
+
+5. Make a note of the shared collection endpoint id (and path relative to the shared collection that you want to share).
+
+   ![](doc/04_endpointid.png)
+
+## Installation
+
+You only need to do this installation once:
 
 1. Open a terminal (e.g. via https://jupyter.nesi.org.nz) and clone this repo somewhere, e.g.
    ```
    git clone https://github.com/chrisdjscott/globus_sync_directory.git ~/globus_sync_directory
    ```
-2. Create a config file and edit it:
-   ```
-   cd ~/globus_sync_directory
-   cp config.ini.example config.ini
-   # edit config.ini
-   ```
-3. Load a Python module:
+2. Load a Python module:
    ```
    ml purge
    ml Python/3.8.2-gimkl-2020a
    ```
-5. Create a virtual environment and install this package:
+3. Create a virtual environment and install this package:
    ```
    python -m venv venv
    source venv/bin/activate
    pip install .
    ```
-6. Open your scrontab:
+4. Create a config file and edit it:
+   ```
+   cd ~/globus_sync_directory
+   cp config.ini.example config.ini
+   # edit config.ini
+   ```
+
+## Automation on NeSI
+
+You could automate running the sync via `scrontab` on NeSI using the wrapper script provided and the following steps.
+Make sure you have followed the installation section above first.
+
+1. Open your scrontab:
    ```
    export EDITOR=nano  # set your favourite editor
    scrontab
    ```
-7. Add the following lines, which will start the sync at midnight NZ time daily (note times in `scrontab` are in UTC, so the 12 belows specifies midnight UTC) and follow up with a status update at 7am (19:00 UTC, the `-d` argument means don't start a new transfer, just print the status of the current/last transfer):
+2. Add the following lines, which will start the sync at midnight NZ time daily (note times in `scrontab` are in UTC, so the 12 belows specifies midnight UTC) and follow up with a status update at 7am (19:00 UTC, the `-d` argument means don't start a new transfer, just print the status of the current/last transfer):
    ```
    #SCRON -t 05:00
    0 12 * * * $HOME/globus_sync_directory/nesi_sync_directory_wrapper.sh
@@ -105,6 +133,34 @@ You could automate running the sync via `scrontab` on NeSI using the wrapper scr
    #SCRON -t 05:00
    0 19 * * * $HOME/globus_sync_directory/nesi_sync_directory_wrapper.sh -d
    ```
-8. Your scheduled cron job should show up in the Slurm queue: `squeue -u $USER`
+3. Your scheduled cron job should show up in the Slurm queue: `squeue -u $USER`
    - Output from the jobs will show up in: *~/globus_sync_directory/globus_sync_directory.log*
-   - You can query the state of the most recent job, if any, by running: `python -m globus_sync_directory -d` from the repo directory
+   - You can query the state of the most recent job, if any, by running: `python -m globus_sync_directory -d` from the repo directory, after following
+     the "Running manually on NeSI" steps below
+
+## Running manually on NeSI
+
+This assumes you have followed the installation steps above
+
+1. Start a new terminal on NeSI (e.g. via JupyterLab)
+2. Change to the `globus_sync_directory` directory
+   ```
+   cd ~/globus_sync_directory
+   ```
+4. Load a Python module:
+   ```
+   ml purge
+   ml Python/3.8.2-gimkl-2020a
+   ```
+5. Source the virtual environment:
+   ```
+   source venv/bin/activate
+   ```
+6. Check the status of any active or recently completed transfer:
+   ```
+   python -m globus_sync_directory -d
+   ```
+7. Start new transfers if they aren't already running:
+   ```
+   python -m globus_sync_directory
+   ```

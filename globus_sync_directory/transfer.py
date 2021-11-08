@@ -208,6 +208,19 @@ class Transfer:
                 self._logger.warning("Transfer failed!")
                 for key in task_info.data.keys():
                     self._logger.warning(f"  {key}: {task_info[key]}")
+
+                # also print task event list if failed
+                fail_count = 0
+                for event in self._tc.paginated.task_event_list(self._transfer_id, limit=10).items():
+                    if event["is_error"]:
+                        line = f"{event['time']}: {event['DATA_TYPE']}: {event['code']} ({event['description']}): {event['details']}"
+                        self._msg.append(line)
+                        self._logger.warning(line)
+                        fail_count += 1
+                    if fail_count >= 2:  # print last two (one for deadline, one for actual error?)
+                        break
+                if fail_count > 0:
+                    self._msg.append("")
             else:
                 for line in msg:
                     self._logger.info(line)
