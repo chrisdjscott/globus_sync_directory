@@ -85,7 +85,7 @@ Create source and destination shared globus collections through the [Globus web 
 
    ![](doc/03_share_permissions.png)
 
-5. Make a note of the shared collection endpoint id (and path relative to the shared collection that you want to share).
+5. Make a note of the shared collection endpoint id (and path relative to the shared collection "Host path" that you want to share) so you can add them to the config file later
 
    ![](doc/04_endpointid.png)
 
