@@ -1,5 +1,14 @@
 # Globus sync directory
 
+* [Requirements](#requirements)
+  - [Register the app with Globus](#register-the-app-with-globus-one-time-setup)
+  - [Globus Endpoint](#globus-endpoint)
+  - [Shared collections for each directory you want to synchronise](#shared-collections-for-each-directory-you-want-to-synchronise)
+* [Installation](#installation)
+* [Upgrading](#upgrading)
+* [Automation on NeSI](#automation-on-nesi)
+* [Running manually on NeSI](#running-manually-on-nesi)
+
 Synchronise directories between Globus shared collections. Files and
 directories will be synchronised from the specified directory on the source
 endpoint to the destination endpoint. Multiple source and destination
@@ -96,6 +105,7 @@ You only need to do this installation once:
 1. Open a terminal (e.g. via https://jupyter.nesi.org.nz) and clone this repo somewhere, e.g.
    ```
    git clone https://github.com/chrisdjscott/globus_sync_directory.git ~/globus_sync_directory
+   cd ~/globus_sync_directory
    ```
 2. Load a Python module:
    ```
@@ -113,6 +123,35 @@ You only need to do this installation once:
    cd ~/globus_sync_directory
    cp config.ini.example config.ini
    # edit config.ini
+   ```
+## Upgrading
+
+Update to the latest version:
+
+1. Open a terminal (e.g. via https://jupyter.nesi.org.nz) and change to the repository directory, e.g.
+   ```
+   cd ~/globus_sync_directory
+   ```
+2. Load a Python module:
+   ```
+   ml purge
+   ml Python/3.8.2-gimkl-2020a
+   ```
+3. Source the virtual environment:
+   ```
+   source venv/bin/activate
+   ```
+4. Stash or commit and untracked changes:
+   ```
+   git stash
+   ```
+5. Pull the latest changes
+   ```
+   git pull
+   ```
+6. Install the latest version
+   ```
+   python -m pip install .
    ```
 
 ## Automation on NeSI
