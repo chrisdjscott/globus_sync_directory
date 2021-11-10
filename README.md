@@ -141,7 +141,7 @@ Update to the latest version:
    ```
    source venv/bin/activate
    ```
-4. Stash or commit and untracked changes:
+4. Stash or commit any untracked changes:
    ```
    git stash
    ```
